@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Quản lý Hợp đồng - Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+     <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo">HD</div>
+            <h1>Quản lý Hợp đồng</h1>
+        </div>
+        <nav class="nav">
+            <a href="#" id="contracts-link" class="active" onclick="openTab('contracts', this)">Các loại hợp đồng</a>
+            <a href="#" id="create-link" onclick="openTab('create', this)">Tạo hợp đồng</a>
+        </nav>
+    </aside>
+      <!-- <div class="sidebar-footer">© 2025 Demo</div> -->
+    </aside>
+
+   <!-- Main content -->
+    <main class="main">
+        <!-- Tab Danh sách hợp đồng -->
+        <div id="contracts-tab">
+            <div class="topbar">
+                <button class="toggle-btn">☰</button>
+                <div class="page-title">Danh sách hợp đồng</div>
+            </div>
+            <div class="card header-flex">
+                <h2>Các loại hợp đồng</h2>
+            </div>
+            <div class="card">
+                <h2>Các loại hợp đồng</h2>
+                <ul class="contract-list">
+                    <li style="display: flex; gap: 10px;">
+                        <button onclick="showContract('hop_dong_thue_nha_sv.html', 'contracts')">
+                            Hợp đồng thuê nhà ở sinh viên
+                        </button>
+                        <button onclick="chonHopDong('hop_dong_thue_nha_sv.html')">
+                            Chọn
+                        </button>
+                    </li>
+                    <li style="display: flex; gap: 10px;">
+                        <button onclick="showContract('hop_dong_lao_dong.html', 'contracts')">Hợp đồng lao động</button>
+                        <button onclick="chonHopDong('hop_dong_lao_dong.html')">Chọn</button>
+                    </li>
+                    <li style="display: flex; gap: 10px;">
+                        <button onclick="showContract('hop_dong_thu_viec.html', 'contracts')">Hợp đồng thử việc</button>
+                        <button onclick="chonHopDong('hop_dong_thu_viec.html')">Chọn</button>
+                    </li>
+                    <li style="display: flex; gap: 10px;">
+                        <button onclick="showContract('hop_dong_mua_ban_tai_san.html', 'contracts')">Hợp đồng mua bán tài sản</button>
+                        <button onclick="chonHopDong('hop_dong_mua_ban_tai_san.html')">Chọn</button>
+                    </li>
+                    <li style="display: flex; gap: 10px;">
+                        <button onclick="showContract('hop_dong_tai_tro.html', 'contracts')">Hợp đồng tài trợ</button>
+                        <button onclick="chonHopDong('hop_dong_tai_tro.html')">Chọn</button>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="contracts-content" class="card" style="display:none;">
+                <h2>Nội dung hợp đồng</h2>
+                <div id="contracts-details"></div>
+            </div>
+
+        </div>
+
+        <!-- Tab Tạo hợp đồng -->
+        <div id="create-tab" style="display:none;">
+            <div class="topbar">
+                <button class="toggle-btn">☰</button>
+                <div class="page-title">Tạo hợp đồng</div>
+            </div>
+            <div class="card">
+                <h2>Nhập thông tin hợp đồng</h2>
+                <div class="input-box">
+                    <!-- <input type="text" id="user-input" placeholder="Nhập thông tin hợp đồng tại đây..." /> -->
+                    <textarea id="user-input" placeholder="Nhập thông tin hợp đồng..." rows="1"></textarea>
+                    <button onclick="submitContract()">Gửi</button>
+                    <label for="upload-contract" class="upload-btn">Tải lên</label>
+                    <input type="file" id="upload-contract" style="display:none;" multiple/>
+                    <button onclick="downloadContract()">Tải Xuống</button>
+                </div>
+                
+            </div>
+            <div id="create-content" class="card" style="display:none;">
+                <h2>Nội dung hợp đồng</h2>
+                <div id="create-details"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- JS Script -->
+<script>
+    
+    
+    // -----------Call upload API --------------
+    const uploadInput = document.getElementById("upload-contract");
+    const userInput = document.getElementById("user-input");
+    let selectedContractFile = "";
+    uploadInput.addEventListener("change", async (event) => {
+        const files = event.target.files;
+        if (!files.length) return;
+
+        const formData = new FormData();
+        for (const file of files) {
+            formData.append("file", file);
+        }
+
+        try {
+            const response = await fetch("http://127.0.0.1:8001/user_upload", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+            if (result.status === "success") {
+                // Giả sử extracted_data là mảng các string, nối thành chuỗi
+                let extractedText = "";
+
+                // Kiểm tra extracted_data có phải là mảng không
+                if (Array.isArray(result.extracted_data)) {
+                    // Nối tất cả text trong mảng object
+                    extractedText = result.extracted_data.map(item => item.text).join(" ");
+                } else if (typeof result.extracted_data === "string") {
+                    extractedText = result.extracted_data;
+                }
+
+                // Đưa dữ liệu vào input
+                userInput.value += extractedText;
+                userInput.dispatchEvent(new Event('input'));
+            } else {
+                alert("Lỗi: " + result.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Lỗi khi tải file lên");
+        }
+    });
+
+    //---------- 
+    async function downloadContract() {
+        // file hiện tại mà bạn chọn trong JS
+        downloadFile = selectedContractFile || "hop_dong_thue_nha_sv.html";
+        const response = await fetch("http://127.0.0.1:8001/download", {
+            method: "POST",
+            headers: {
+                "accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                path: downloadFile
+            })
+        });
+
+        if (!response.ok) {
+            alert("Có lỗi khi tải file");
+            return;
+        }
+
+        // nhận blob từ response
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        // tạo link ẩn để tải xuống
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = downloadFile.replace(".html", ".docx"); // đổi tên file
+        document.body.appendChild(a);
+        a.click();
+
+        // cleanup
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    }
+    function openTab(tab, element) {
+        // Ẩn tất cả tab
+        document.getElementById('contracts-tab').style.display = (tab === 'contracts') ? 'block' : 'none';
+        document.getElementById('create-tab').style.display = (tab === 'create') ? 'block' : 'none';
+
+        // Xóa active cũ
+        document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+        if (element) element.classList.add('active');
+    }
+
+    function showContract(fileName, target = 'contracts') {
+        let contentId = (target === 'create') ? 'create-content' : 'contracts-content';
+        let detailsId = (target === 'create') ? 'create-details' : 'contracts-details';
+
+        const content = document.getElementById(contentId);
+        const details = document.getElementById(detailsId);
+
+        fetch(fileName)
+        .then(response => response.text())
+        .then(html => {
+            details.innerHTML = html;
+            content.style.display = "block";
+        })
+        .catch(err => {
+            details.innerHTML = "<p style='color:red;'>Không thể tải nội dung hợp đồng.</p>";
+            content.style.display = "block";
+            console.error(err);
+        });
+    }
+
+    async function submitContract() {
+        const textarea = document.getElementById('user-input');
+        const value = textarea.value.trim();
+        
+        let contractName = "";
+        let normalizedFile = (selectedContractFile || "hop_dong_thue_nha_sv.html").replace("_copy", "");
+
+        if (normalizedFile === "hop_dong_thue_nha_sv.html") {
+            contractName = "HỢP ĐỒNG THUÊ NHÀ Ở SINH VIÊN";
+        } else if (normalizedFile === "hop_dong_lao_dong.html") {
+            contractName = "HỢP ĐỒNG LAO ĐỘNG";
+        } else if (normalizedFile === "hop_dong_thu_viec.html") {
+            contractName = "HỢP ĐỒNG THỬ VIỆC";
+        } else if (normalizedFile === "hop_dong_mua_ban_tai_san.html") {
+            contractName = "HỢP ĐỒNG MUA BÁN TÀI SẢN";
+        } else if (normalizedFile === "hop_dong_tai_tro.html") {
+            contractName = "HỢP ĐỒNG TÀI TRỢ";
+        } else {
+            contractName = "HỢP ĐỒNG KHÁC";
+        }
+
+        const data = {
+            user_input: value,
+            contract_name: contractName
+        };
+        console.log(data)
+        
+        try {
+            const response = await fetch("http://127.0.0.1:8001/gen_form", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+
+            if (!response.ok) {
+                throw new Error("Lỗi khi gọi API");
+            }
+
+            const result = await response.text();; // đây chính là result từ FastAPI
+            let fileName = (selectedContractFile || "hop_dong_thue_nha_sv.html").replace(/\.html$/, "_copy.html");
+            chonHopDong(fileName)
+
+        } catch (err) {
+            console.error(err);
+            alert("Có lỗi xảy ra khi gửi dữ liệu!");
+        }
+    }
+
+    function chonHopDong(file) {
+        // console.log("Chọn file:", file);
+        selectedContractFile = file.trim();  // bỏ khoảng trắng thừa
+        openTab('create');   
+        showContract(file, 'create');
+    }
+
+
+
+    function handleUploadContract(event) {
+        const files = event.target.files; // lấy tất cả file
+        if (!files.length) return;
+
+        const allowed = [
+            "text/html",
+            "application/pdf",
+            "image/png",
+            "image/jpeg"
+        ];
+
+        const details = document.getElementById("contract-details");
+        const content = document.getElementById("contract-content");
+
+        details.innerHTML = ""; // reset hiển thị cũ
+        content.style.display = "block";
+
+        Array.from(files).forEach(file => {
+            if (!allowed.includes(file.type)) {
+                alert("File không hợp lệ: " + file.name);
+                return;
+            }
+
+            if (file.type === "text/html") {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    details.innerHTML += `<div class="html-preview">${e.target.result}</div>`;
+                };
+                reader.readAsText(file);
+            }
+
+            if (file.type === "application/pdf") {
+                const url = URL.createObjectURL(file);
+                details.innerHTML += `<iframe src="${url}" width="100%" height="400px" style="margin-top:10px;"></iframe>`;
+            }
+
+            if (file.type.startsWith("image/")) {
+                const url = URL.createObjectURL(file);
+                details.innerHTML += `<img src="${url}" alt="Hình ảnh hợp đồng" style="max-width:100%; height:auto; margin-top:10px; border:1px solid #ccc; border-radius:8px;" />`;
+            }
+        });
+    }
+
+    const textarea = document.getElementById("user-input");
+
+    textarea.addEventListener("input", () => {
+        textarea.style.height = "auto"; // reset chiều cao
+        textarea.style.height = textarea.scrollHeight + "px"; // auto adjust
+    });
+
+</script>
+
+</body>
+</html>

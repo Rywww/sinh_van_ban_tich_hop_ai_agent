@@ -1,0 +1,189 @@
+:root {
+  --bg: #f4f7fb;
+  --sidebar: #0f1724;
+  --accent: #0ea5a4;
+  --card: #ffffff;
+  --text: #0f1724;
+}
+
+/* Reset cơ bản */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, Arial, sans-serif; }
+html, body { height: 100%; }
+a { color: inherit; text-decoration: none; }
+
+.app {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, var(--sidebar), #102032);
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo {
+  width: 44px; height: 44px; border-radius: 8px; background: var(--accent);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; color: white;
+}
+.brand h1 { font-size: 16px; letter-spacing: 0.2px; }
+.nav { margin-top: 6px; display: flex; flex-direction: column; gap: 8px; }
+.nav a {
+  display: flex; gap: 12px; align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #e6eef6;
+  font-weight: 600;
+}
+.nav a:hover { background: rgba(255, 255, 255, 0.04); }
+.nav a.active { background: rgba(255, 255, 255, 0.08); }
+
+.sidebar-footer {
+  margin-top: auto;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Main content */
+.main { flex: 1; padding: 28px; display: flex; flex-direction: column; gap: 18px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.toggle-btn { display: none; background: transparent; border: 1px solid #ccc; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+.page-title { font-size: 20px; color: var(--text); font-weight: 700; }
+
+.card {
+  background: var(--card);
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(20, 30, 40, 0.06);
+}
+
+/* Danh sách hợp đồng */
+/* Danh sách hợp đồng */
+.contract-list {
+  list-style: none;   /* bỏ chấm tròn trước li */
+  padding: 0;
+  margin: 0;
+}
+
+.contract-list li {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  gap: 10px; /* khoảng cách giữa các nút */
+}
+
+/* Nút hợp đồng (bên trái) */
+.contract-list li button:first-child {
+  flex: 1; /* chiếm toàn bộ chiều rộng còn lại */
+  padding: 10px;
+  background-color: #007bff; /* xanh dương */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.contract-list li button:first-child:hover {
+  background-color: #0056b3;
+}
+.contract-list li button:first-child:active {
+  background-color: #003d82;
+}
+.contract-list li button:first-child:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.5);
+}
+
+/* Nút chọn (bên phải) */
+.contract-list li button:last-child {
+  flex: 0 0 auto; /* chỉ vừa đủ nội dung */
+  padding: 10px 16px;
+  background-color: #28a745; /* xanh lá */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.contract-list li button:last-child:hover {
+  background-color: #218838;
+}
+.contract-list li button:last-child:active {
+  background-color: #1e7e34;
+}
+.contract-list li button:last-child:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(40,167,69,0.5);
+}
+
+
+.header-flex {
+  display: flex;
+  justify-content: space-between; /* đẩy h2 sang trái, nút tải lên sang phải */
+  align-items: center;
+}
+
+.upload-btn {
+  background-color: #28a745;  /* xanh lá */
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s ease;
+}
+
+.upload-btn:hover {
+  background-color: #218838;  /* xanh đậm hơn khi hover */
+}
+
+.input-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+.input-box input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 800px; /* giá trị mặc định */
+    min-width: 800px;
+    max-width: 100%;
+    box-sizing: content-box;
+}
+
+.input-box textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 800px; /* giá trị mặc định */
+    min-width: 800px;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    resize: none; /* không cho resize thủ công */
+    line-height: 1.4;
+}
+
+
+.input-box button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #0078d7;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.input-box button:hover {
+    background-color: #005fa3;
+}
